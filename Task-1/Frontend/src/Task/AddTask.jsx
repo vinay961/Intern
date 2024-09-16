@@ -1,22 +1,49 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom'; 
+import { useNavigate } from 'react-router-dom';
 
-const AddTask = ({ onAddTask }) => {
+const AddTask = () => {
   const [taskName, setTaskName] = useState('');
   const [description, setDescription] = useState('');
+  const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
   const navigate = useNavigate(); 
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+
     if (taskName && description) {
-      onAddTask({ taskName, description });
-      setTaskName('');
-      setDescription('');
+      try {
+        const response = await fetch('http://localhost:3500/task/addtask', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ name: taskName, desc: description }),
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+          setSuccess('Task added successfully!');
+          setTaskName('');
+          setDescription('');
+          setError(''); 
+        } else {
+          setError(data.message || 'Something went wrong');
+          setSuccess('');
+        }
+      } catch (err) {
+        console.error('Error:', err);
+        setError('Failed to add task. Please try again.');
+        setSuccess('');
+      }
+    } else {
+      setError('Please fill in both fields');
     }
   };
 
   const handleViewTasks = () => {
-    navigate('/tasks'); 
+    navigate('/tasks');
   };
 
   return (
@@ -24,6 +51,8 @@ const AddTask = ({ onAddTask }) => {
       <h1 className="text-4xl font-bold text-white mb-8">Welcome to Task Manager</h1>
       <div className="max-w-lg w-full p-8 bg-white shadow-lg rounded-md">
         <h2 className="text-3xl font-semibold mb-6 text-center">Add New Task</h2>
+        {error && <p className="text-red-500 text-center mb-4">{error}</p>}
+        {success && <p className="text-green-500 text-center mb-4">{success}</p>}
         <form onSubmit={handleSubmit}>
           <div className="mb-6">
             <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="taskName">
