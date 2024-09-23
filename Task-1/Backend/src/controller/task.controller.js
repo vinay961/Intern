@@ -42,7 +42,7 @@ const addTask = async (req, res) => {
         console.log("Saved task:", savedTask);
 
         // Respond with the saved task
-        res.status(201).json({
+        return res.status(201).json({
             message: "Task created successfully",
             status: 201,
             savedTask
