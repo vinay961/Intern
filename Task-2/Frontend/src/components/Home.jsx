@@ -1,12 +1,25 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import axios from 'axios'; // Import Axios if you're using it
 
 const HomePage = () => {
-    const navigate = useNavigate();
-  const [blogs, setBlogs] = useState([
-    { id: 1, title: "First Blog", content: "This is the content of the first blog." },
-    { id: 2, title: "Second Blog", content: "This is the content of the second blog." },
-  ]);
+  const navigate = useNavigate();
+  const [blogs, setBlogs] = useState([]);
+
+  // Fetch blogs from the API
+  useEffect(() => {
+    const fetchBlogs = async () => {
+      try {
+        const response = await fetch('http://localhost:4500/blog/getblog');
+        console.log(response);
+        setBlogs(response.data);
+      } catch (error) {
+        console.error('Error fetching blogs:', error);
+      }
+    };
+
+    fetchBlogs();
+  }, []);
 
   // Function to delete a blog
   const deleteBlog = (id) => {
@@ -58,7 +71,7 @@ const HomePage = () => {
 
         {/* Add New Blog Button */}
         <div className="mt-8 text-center">
-          <button onClick={()=>{navigate('/addpost')}} className="bg-green-600 text-white py-3 px-8 rounded-full hover:bg-green-700 transition-colors duration-300">
+          <button onClick={() => { navigate('/addpost'); }} className="bg-green-600 text-white py-3 px-8 rounded-full hover:bg-green-700 transition-colors duration-300">
             Add New Blog
           </button>
         </div>

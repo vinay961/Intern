@@ -23,7 +23,7 @@ const AddBlog = () => {
     e.preventDefault();
     
     try {
-      const response = await fetch('/api/blogs', {
+      const response = await fetch('http://localhost:4500/blog/setblog', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
