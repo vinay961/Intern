@@ -11,19 +11,26 @@ const HomePage = () => {
     const fetchBlogs = async () => {
       try {
         const response = await fetch('http://localhost:4500/blog/getblog');
-        console.log(response);
-        setBlogs(response.data);
+  
+        if (response.ok) {
+          const data = await response.json();
+          console.log(data); 
+          setBlogs(data.data);
+        } else {
+          console.error('Failed to fetch blogs:', response.statusText);
+        }
       } catch (error) {
         console.error('Error fetching blogs:', error);
       }
     };
-
+  
     fetchBlogs();
   }, []);
+  
 
   // Function to delete a blog
   const deleteBlog = (id) => {
-    const updatedBlogs = blogs.filter((blog) => blog.id !== id);
+    const updatedBlogs = blogs.filter((blog) => blog._id !== id);
     setBlogs(updatedBlogs);
   };
 
@@ -51,17 +58,20 @@ const HomePage = () => {
         {/* Blog List */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {blogs.map((blog) => (
-            <div key={blog.id} className="bg-gray-800 p-6 rounded-lg shadow-lg hover:shadow-xl transition-shadow duration-300 ease-in-out">
+            <div key={blog._id} className="bg-gray-800 p-6 rounded-lg shadow-lg hover:shadow-xl transition-shadow duration-300 ease-in-out">
               <h2 className="text-2xl font-bold mb-4 text-white">{blog.title}</h2>
+              <p className="text-gray-400 mb-2">Category: {blog.category}</p>
+              <p className="text-gray-400 mb-2">Author: {blog.author}</p>
+              <p className="text-gray-400 mb-2">Published: {new Date(blog.createdAt).toLocaleDateString()}</p>
               <p className="text-gray-400 mb-4">{blog.content}</p>
               <div className="flex justify-between">
                 <button
                   className="bg-red-600 text-white py-2 px-4 rounded hover:bg-red-700 transition-colors duration-300"
-                  onClick={() => deleteBlog(blog.id)}
+                  onClick={() => deleteBlog(blog._id)}
                 >
                   Delete
                 </button>
-                <button className="bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700 transition-colors duration-300">
+                <button onClick={()=>{navigate(`/viewblog/${blog._id}`)}} className="bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700 transition-colors duration-300">
                   View Blog
                 </button>
               </div>

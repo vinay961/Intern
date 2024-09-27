@@ -35,28 +35,65 @@ const setBlog = async(req,res) => {
     }
 }
 
-const getBlog = async(req,res) => {
+const getBlog = async (req, res) => {
     try {
-        let blogs = BlogPost.find();
-        if(!blogs){
-            throw new Error(401,"No blogs are found.")
-        }
-        console.log(blogs);
-        return res.status(201).json({
-            status:201,
-            message:"Successfully fetched blogs",
-            blogs
-        })
+      const blogs = await BlogPost.find();
+  
+      if (!blogs || blogs.length === 0) {
+        return res.status(404).json({
+          status: 404,
+          message: "No blogs found."
+        });
+      }
+  
+      console.log(blogs);
+      
+      return res.status(200).json({
+        status: 200,
+        message: "Successfully fetched blogs",
+        data: blogs
+      });
     } catch (error) {
-        console.log(error);
-        return res.status(400).json({
-            status:400,
-            message:"No able to fetch the data."
-        })
+      console.error(error);
+  
+      return res.status(500).json({
+        status: 500,
+        message: "Unable to fetch the data.",
+        error: error.message 
+      });
     }
-}
+};
 
+const getSpecificBlog = async (req, res) => {
+    try {
+      const { _id } = req.params; 
+      const blog = await BlogPost.findById(_id); 
+  
+      if (!blog) {
+        
+        return res.status(404).json({
+          status: 404,
+          message: 'Blog not found',
+        });
+      }
+  
+      return res.status(200).json({
+        status: 200,
+        message: 'Successfully fetched the blog',
+        blog,
+      });
+    } catch (error) {
+      console.error('Error fetching the blog:', error);
+      return res.status(500).json({
+        status: 500,
+        message: 'Error fetching the blog',
+      });
+    }
+  };
+  
+  
 export {
     setBlog,
-    getBlog
+    getBlog,
+    getSpecificBlog
 }
